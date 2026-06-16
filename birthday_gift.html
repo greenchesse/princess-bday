@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ♡</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5ede0;
+    --paper: #fbf6ed;
+    --brown: #8b7355;
+    --terracotta: #c97c5d;
+    --sage: #9caf88;
+    --ink: #3a2e27;
+    --pink: #e8b4b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--cream);
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(201,124,93,0.06) 0, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(156,175,136,0.07) 0, transparent 40%);
+    font-family: 'Lora', serif;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ── INTRO SCREEN ── */
+  #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream);
+    background-image:
+      radial-gradient(circle at 30% 40%, rgba(201,124,93,0.1) 0, transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(156,175,136,0.1) 0, transparent 50%);
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+    text-align: center;
+    padding: 30px;
+  }
+
+  #intro.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .intro-hearts {
+    font-size: 2.5rem;
+    letter-spacing: 0.3rem;
+    margin-bottom: 24px;
+    animation: floatHearts 3s ease-in-out infinite;
+  }
+
+  @keyframes floatHearts {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .intro-title {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(2.8rem, 10vw, 5rem);
+    font-weight: 700;
+    color: var(--terracotta);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .intro-sub {
+    font-style: italic;
+    color: var(--brown);
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+    opacity: 0.85;
+  }
+
+  .enter-btn {
+    font-family: 'Caveat', cursive;
+    font-size: 1.7rem;
+    font-weight: 700;
+    background: var(--terracotta);
+    color: var(--paper);
+    border: none;
+    padding: 16px 44px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(201,124,93,0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .enter-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .enter-btn:hover {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 10px 28px rgba(201,124,93,0.5);
+  }
+
+  .enter-btn:hover::after { opacity: 1; }
+
+  .intro-note {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--brown);
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* ── MUSIC PLAYER BAR ── */
+  #music-bar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(251,246,237,0.92);
+    border: 1px solid rgba(139,115,85,0.2);
+    padding: 10px 16px;
+    border-radius: 40px;
+    box-shadow: 0 4px 16px rgba(58,46,39,0.15);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  #music-bar.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #music-toggle {
+    background: var(--terracotta);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: white;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  #music-toggle:hover { transform: scale(1.1); }
+
+  .music-info {
+    font-family: 'Caveat', cursive;
+    font-size: 1rem;
+    color: var(--brown);
+    line-height: 1.2;
+  }
+
+  .music-info span {
+    display: block;
+    font-size: 0.78rem;
+    opacity: 0.7;
+    font-family: 'Lora', serif;
+    font-style: italic;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    padding: 40px 20px 80px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+  }
+
+  #main.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .hero h1 {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    color: var(--terracotta);
+    line-height: 1.1;
+  }
+
+  .hero p {
+    font-style: italic;
+    color: var(--brown);
+    margin-top: 8px;
+    font-size: 1.1rem;
+  }
+
+  .hero .divider {
+    width: 120px;
+    height: 2px;
+    background: var(--sage);
+    margin: 18px auto 0;
+    border-radius: 2px;
+    opacity: 0.6;
+  }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 36px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 30px;
+  }
+
+  .card-wrap { perspective: 1500px; }
+
+  .card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .card-wrap:nth-child(odd) .card { transform: rotate(-2.5deg); }
+  .card-wrap:nth-child(even) .card { transform: rotate(2deg); }
+  .card-wrap:nth-child(3n) .card { transform: rotate(-1.5deg); }
+  .card.flipped { transform: rotateY(180deg) !important; }
+
+  .card-wrap:hover .card:not(.flipped) {
+    transform: rotate(0deg) translateY(-6px) scale(1.03);
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 4px;
+    box-shadow: 0 6px 18px rgba(58,46,39,0.18), 0 1px 4px rgba(58,46,39,0.1);
+  }
+
+  .front {
+    background: #ffffff;
+    padding: 14px 14px 50px 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .photo {
+    flex: 1;
+    background: linear-gradient(135deg, #e0d4c3, #cdbfa9);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brown);
+    font-family: 'Lora', serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+  }
+
+  .caption {
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-top: 10px;
+    padding: 0 6px;
+  }
+
+  .tape {
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 60px; height: 22px;
+    background: rgba(232,180,184,0.65);
+    border: 1px solid rgba(255,255,255,0.4);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  }
+
+  .card-wrap:nth-child(even) .tape {
+    transform: translateX(-50%) rotate(3deg);
+    background: rgba(156,175,136,0.5);
+  }
+
+  .back {
+    background: var(--paper);
+    background-image: repeating-linear-gradient(
+      to bottom, transparent 0px, transparent 27px,
+      rgba(139,115,85,0.12) 28px
+    );
+    transform: rotateY(180deg);
+    padding: 26px 22px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(139,115,85,0.15);
+  }
+
+  .back::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 28px; bottom: 0;
+    width: 1px;
+    background: rgba(201,124,93,0.25);
+  }
+
+  .back .letter-num {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem;
+    color: var(--terracotta);
+    margin-bottom: 6px;
+    align-self: flex-end;
+  }
+
+  .back .letter-text {
+    font-family: 'Kalam', cursive;
+    font-size: 1.05rem;
+    line-height: 28px;
+    color: var(--ink);
+    overflow-y: auto;
+    flex: 1;
+    padding-left: 8px;
+  }
+
+  .back .letter-text:empty::before {
+    content: attr(data-placeholder);
+    color: var(--brown);
+    opacity: 0.55;
+    font-style: italic;
+  }
+
+  .hint {
+    text-align: center;
+    color: var(--brown);
+    font-style: italic;
+    font-size: 0.95rem;
+    margin-top: 6px;
+    opacity: 0.8;
+  }
+
+  /* ── LOVE LETTER BUTTON ── */
+  .letter-section {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .letter-btn {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: var(--terracotta);
+    color: var(--paper);
+    border: none;
+    padding: 14px 36px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(201,124,93,0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .letter-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 6px 18px rgba(201,124,93,0.45);
+  }
+
+  /* ── LETTER MODAL ── */
+  .letter-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(58,46,39,0.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .letter-overlay.open { display: flex; }
+
+  .envelope {
+    background: var(--paper);
+    background-image: repeating-linear-gradient(
+      to bottom, transparent 0px, transparent 27px,
+      rgba(139,115,85,0.12) 28px
+    );
+    max-width: 600px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 6px;
+    padding: 40px 36px;
+    box-shadow: 0 10px 40px rgba(58,46,39,0.35);
+    position: relative;
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+  }
+
+  .letter-overlay.open .envelope {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  .envelope h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 2.4rem;
+    color: var(--terracotta);
+    margin: 0 0 18px;
+    text-align: center;
+  }
+
+  .envelope .letter-body {
+    font-family: 'Kalam', cursive;
+    font-size: 1.1rem;
+    line-height: 28px;
+    color: var(--ink);
+    white-space: pre-wrap;
+  }
+
+  .envelope .letter-body:empty::before {
+    content: attr(data-placeholder);
+    color: var(--brown);
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  .close-letter {
+    position: absolute;
+    top: 14px; right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--brown);
+    cursor: pointer;
+  }
+
+  .close-letter:hover { color: var(--terracotta); }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 60px;
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    color: var(--sage);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .card-wrap:hover .card { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ INTRO SCREEN ══ -->
+<div id="intro">
+  <div class="intro-hearts">♡ ♡ ♡</div>
+  <div class="intro-title">Happy Birthday,<br>My Love</div>
+  <div class="intro-sub">I made something just for you</div>
+  <button class="enter-btn" id="enterBtn">See my love for you ♡</button>
+  <p class="intro-note">🎵 music will play</p>
+</div>
+
+<!-- ══ MUSIC BAR ══ -->
+<div id="music-bar">
+  <button id="music-toggle" title="Play / Pause">▶</button>
+  <div class="music-info">
+    Now Playing
+    <span id="song-name">your song</span>
+  </div>
+</div>
+
+<!-- ══ MAIN CONTENT ══ -->
+<div id="main">
+  <div class="hero">
+    <h1>Happy Birthday, Love</h1>
+    <p>10 little memories, just for you. Tap each one to flip it over.</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="letter-section">
+    <button class="letter-btn" id="openLetter">read my love letter ♡</button>
+  </div>
+
+  <div class="letter-overlay" id="letterOverlay">
+    <div class="envelope">
+      <button class="close-letter" id="closeLetter">&times;</button>
+      <h2>To you</h2>
+      <div class="letter-body" id="letterBody" data-placeholder="Write your love letter here..."></div>
+    </div>
+  </div>
+
+  <div class="footer-note">— with all my love —</div>
+</div>
+
+<audio id="bgMusic" loop>
+  <!--
+    ══════════════════════════════════════════════
+    HOW TO ADD YOUR SONG:
+    1. Put your MP3 file in the same folder as this HTML
+    2. Replace "your-song.mp3" below with your filename
+    3. Also update the song name in the JS section below
+    ══════════════════════════════════════════════
+  -->
+  <source src="Music/music.m4a" type="audio/mp4">
+</audio>
+
+<script>
+  // ══ EDIT THESE ══════════════════════════════════
+  const SONG_NAME = "Faye Webster - Kind Of";   // shown in music bar
+  const NUM_CARDS = 10;
+
+  const cards = [
+      { photo: "Photo/first-photo(notOfficial).jpg", caption: "Our first photo together(not official)", letter: "This was the first time ta mag interact ning mas tultul and to be honest im not expecting much na may crush ka palan sako, tbh magayon si fit mo kang day nayan and na inlove ako saemo diit hehe." },
+      { photo: "Photo/First-Photo.jpg", caption: "Our first photo together", letter: "This picture really remind me kung pano ako ka broke, sa first date ta ning mas magayon, kala ko dati dae kaman maki kape pero trip mo pala yan sobrang nagustuhan takana kayan." },
+      { photo: "Photo/goofy-face.jpg", caption: "Goofy faces", letter: "I love youu super maski goofy ang mukha ta pareho, dae ko na maisip na dae ka good looking minsan pag mayo ayos tig iisip ko lang pirmi ka magayon bonus nalang pag nakaayos ka ning maray na maray." },
+      { photo: "Photo/date-night.jpg", caption: "Date night", letter: "Ini si day na pig pa bisto taka sa angkan ko hehe, medyo sakitan lang saemo piriton ta garo kanang pisot ka lumbod abo mo mag sama, dae ko din expect na dakul palan tao kang aldaw nayan halos gabus yaraon kaya i get na supog ka that time, pero si fit mo grabe pang may dating talaga." },
+      { photo: "Photo/just-us-being-us.jpg", caption: "Just us, being us", letter: "By far ini paborito kong random pic ta ugmahon ka kaya digdi sa pic mo habang nag kakape garo ka aking natawan dulsi, miss ko na mag kape kitaa I lovee youu." },
+      { photo: "Photo/my-birthday.jpg", caption: "my birthday", letter: "Pinaka sulit na aldaw kang birthday ko, ta nakuha ko ang gustohon kong wish ang makaiba ka too bad lang ta dae ka nakasama sa bahay para mag kakan pasta yan paborito ko sa pic sa aldaw nayan hehe." },
+      { photo: "Photo/our-first-firsttime.jpg", caption: "our first first time", letter: "Siguro ito ang flex sa relationship ta, ta ini ang same tang parehas or parehas firstime para sako big win nayan, lapa lang ta pag firstime dae masyado maangas paka kuha hehe." },
+      { photo: "Photo/first-win.jpg", caption: "our first win", letter: "first win ta sa banda pinaka solid and remarkable na day ta nagana kita parehas as banda, dae kaya kita maka bwelo kayan ta yaon si sir pero nagana man, trip ko na maray yan fit mo dyan sa aldaw nayan gustohon ko arug kayan ika garo maria clara." },
+      { photo: "Photo/my-fav.jpg", caption: "My favorite shot of you", letter: "yan pinaka paborito kong pic mo igde sa gallery ko maski haling iwal kita dyan, minsan daw nag dadakula na payo mo ano? pero maski arug kayan padangat taka pirmi." },
+      { photo: "Photo/looking-for-more.jpg", caption: "Looking forward to more", letter: "looking forward sa more years and forever ta sana mas mag grow strong kita pareho ma overcome ang mga weak spots si mga weakness ta sa relation ship looking forward sa asawa ko soon." }
+  ];
+
+  const loveLetter = "hello baby happy birthday,\n\n	happy birthday to the most precious loving and pretty girlfriend Princess. ever since na bisto taka my life really change into something really beautiful di ko masyado alam why or pano mo binago ang buhay ko, siguro ako na pinaka swerte na lalake sa mundo na nakahanap akong babae na mas ma momotivate ako or mas magiging better or mas mag iimprove di mo aram kung pano moko binago hehe, Ang wish ko sa birthday mo is more paldo more experience with you, forever siguro and less iwal and mag yaman na tulos kita para magibo na ang pangarap ng mag kasama, throughout ning year ta garo roller coaster dakul ups and down daming confusion dakul din pungutan pero none sato ang may bayag to fully let go kasi we work as hole and dyan mas na momotivate ako gibuhon gabus para sa mas makaka buti sato.\n\n	the thoughts of losing you?. nasabi ko na ni saemo na dae ko aram mangyayari sako kung mawara ka or kung may mangyari saemong makanos talagang maiwal ang langit saka lupa pero dae man siguro yan ta tig pray taka ki god na mas maabot mo pa pangarap mo mas mag shine through ka sa gabus talagang mas maging better ka sako, basta inda dae ko aram kung mawara ka sako mas malalapa ako kung mayo ka, kaya pilion mo sana ako pirmi maski sobrang sakit na iyo po I lovee youu.\n\n	aram mo I like you kang pount palang, tig pa realize mo sako na ika lang ang babae mapadangat sako maski mayo pako sa best version or dae ko pa abot ang pangarap ko, and tig sabi ko sa sadiri ko na ika ang papakasalan ko pag na abot ko na tung mga pangarap ko, kaya no matter what happend dae taka i didisappoint, pero minsan po nalilingaw ko si promise ko sa sadiri ko kaya po minsan nag iiwal kita pero dae man mean ng iwal ta ning sa pag karaot pero siguro pag kaintindi sato, dae taka e lelet down gigibuhon ko gabus para mas mapa ugma taka and matawan takang magayon na buhay ta ika ang buhay ko.";
+  // ════════════════════════════════════════════════
+
+  // Song name label
+  document.getElementById('song-name').textContent = SONG_NAME;
+
+  // Build polaroid grid
+  const grid = document.getElementById('grid');
+  cards.forEach((data, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'card-wrap';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    // Front
+    const front = document.createElement('div');
+    front.className = 'face front';
+
+    const tape = document.createElement('div');
+    tape.className = 'tape';
+    front.appendChild(tape);
+
+    const photo = document.createElement('div');
+    photo.className = 'photo';
+    if (data.photo) {
+      const img = document.createElement('img');
+      img.src = data.photo;
+      img.alt = data.caption;
+      photo.appendChild(img);
+    } else {
+      photo.innerHTML = `Memory #${i+1}<br><span style="font-size:0.75rem">(add your photo here)</span>`;
+    }
+    front.appendChild(photo);
+
+    const caption = document.createElement('div');
+    caption.className = 'caption';
+    caption.textContent = data.caption || `Memory #${i+1}`;
+    front.appendChild(caption);
+
+    // Back
+    const back = document.createElement('div');
+    back.className = 'face back';
+
+    const num = document.createElement('div');
+    num.className = 'letter-num';
+    num.textContent = `${i+1} / ${NUM_CARDS}`;
+    back.appendChild(num);
+
+    const letterText = document.createElement('div');
+    letterText.className = 'letter-text';
+    letterText.setAttribute('data-placeholder', 'Write your note for this memory...');
+    letterText.textContent = data.letter || '';
+    back.appendChild(letterText);
+
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.textContent = 'tap to flip back';
+    back.appendChild(hint);
+
+    card.appendChild(front);
+    card.appendChild(back);
+    wrap.appendChild(card);
+    grid.appendChild(wrap);
+
+    wrap.addEventListener('click', () => card.classList.toggle('flipped'));
+  });
+
+  // Love letter modal
+  const letterBody = document.getElementById('letterBody');
+  letterBody.textContent = loveLetter;
+
+  const overlay = document.getElementById('letterOverlay');
+  document.getElementById('openLetter').addEventListener('click', () => overlay.classList.add('open'));
+  document.getElementById('closeLetter').addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+
+  // ── INTRO + MUSIC ──
+  const audio = document.getElementById('bgMusic');
+  const intro = document.getElementById('intro');
+  const main  = document.getElementById('main');
+  const musicBar = document.getElementById('music-bar');
+  const toggleBtn = document.getElementById('music-toggle');
+
+  audio.volume = 0.55;
+
+  document.getElementById('enterBtn').addEventListener('click', () => {
+    // Play music (triggered by user gesture — required by browsers)
+    audio.play().catch(() => {}); // fails silently if no file yet
+
+    // Hide intro, reveal main
+    intro.classList.add('hidden');
+    main.classList.add('visible');
+
+    // Show music bar after a beat
+    setTimeout(() => musicBar.classList.add('visible'), 600);
+  });
+
+  // Music toggle button
+  toggleBtn.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play();
+      toggleBtn.textContent = '⏸';
+    } else {
+      audio.pause();
+      toggleBtn.textContent = '▶';
+    }
+  });
+
+  // Keep icon in sync
+  audio.addEventListener('play',  () => toggleBtn.textContent = '⏸');
+  audio.addEventListener('pause', () => toggleBtn.textContent = '▶');
+</script>
+</body>
+</html>
